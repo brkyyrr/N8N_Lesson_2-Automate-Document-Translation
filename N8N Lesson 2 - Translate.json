@@ -1,0 +1,483 @@
+{
+  "name": "N8N Lesson 2 - Google Translate",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1pDH8tcETu5ntJVr5moPY1NjWIzlL69eZ",
+          "mode": "list",
+          "cachedResultName": "translate",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1pDH8tcETu5ntJVr5moPY1NjWIzlL69eZ"
+        },
+        "event": "fileUpdated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -864,
+        -64
+      ],
+      "id": "8b4445a8-84a9-4d69-975a-5d7cd3a62dea",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "jVg0ncUZR83PzvSF",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.webViewLink }}",
+          "mode": "url"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -656,
+        -64
+      ],
+      "id": "b37544df-9383-46e4-b8e9-268f8ec0aacd",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "jVg0ncUZR83PzvSF",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Çevirisini istediğimiz dosyaların olduğu klasörü tanımlıyoruz.\nDosyayı işlemek için indirme işlemini yapıyoruz.\nEklenen dosyanın türünü anlamak için Switch ekliyoruz.\nPDF içindekileri metin dosyasına çıkartıyoruz.\nSes dosyasını çevirmek için HTTP Request ekliyoruz.\nİkl dosyanın da sonucu text olacağından Edit Fields ile bunları alıyorum.\nDeepL API kullanarak çeviri işlemini gerçekleştiriyorum.\nAI Agent ile oluşturduğumuz çevirinin Google Drive üzerine gitmesi ve orada bir doküman oluşturma bağlantısını kurması için ekliyorum.\nArdından Dokuman oluşturup, çevrilen kelimeler ile update ederek süreci tamamlıyorum\n\n",
+        "height": 256,
+        "width": 816,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        416,
+        -496
+      ],
+      "typeVersion": 1,
+      "id": "d5b99b0e-79ea-462a-b91b-440dda70a7c1",
+      "name": "Sticky Note",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.fileExtension }}",
+                    "rightValue": "pdf",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "ce36bdb8-6f31-471e-a434-61393ca33366"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "PDF"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f6f36fa8-19d3-49eb-92d7-deb91d90cafa",
+                    "leftValue": "={{ $json.fileExtension }}",
+                    "rightValue": "mp4",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "MP4"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -448,
+        -64
+      ],
+      "id": "39fc745f-e84f-432d-88ee-64b38e07a8f8",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        -224
+      ],
+      "id": "fe1965c2-dec3-4bd0-9fcd-3300e815a1e5",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.elevenlabs.io/v1/speech-to-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "sk_93b309c36352075641d7ec004d76fb6f9029a6929339d18d"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -208,
+        48
+      ],
+      "id": "950b7f0e-a900-4bc1-a2a5-83734f8d3ab9",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7ac711f0-5ba6-4452-86c5-b36a566add18",
+              "name": "text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        64,
+        -80
+      ],
+      "id": "bc2ded33-e918-4dc0-af2b-ce32ca692c27",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        480,
+        -80
+      ],
+      "id": "18fefa26-528f-4996-b753-737753262699",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        352,
+        128
+      ],
+      "id": "019ddaeb-7d9e-4fa8-9954-241e086dd189",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "4Rm2h4E37OMZOyNX",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "12345",
+        "contextWindowLength": 100
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        496,
+        128
+      ],
+      "id": "0359928b-cc61-46b9-a064-52f7a9ebb023",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "folderId": "1pDH8tcETu5ntJVr5moPY1NjWIzlL69eZ",
+        "title": "=Translate"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        832,
+        -80
+      ],
+      "id": "b1bd70ab-7494-45b8-823e-e2787b366204",
+      "name": "Create a document",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "0t1ErSuUw8Ln8Ov9",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.text }}",
+        "translateTo": "TR",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.deepL",
+      "typeVersion": 1,
+      "position": [
+        272,
+        -80
+      ],
+      "id": "67593b80-331d-4602-a762-629a6f45d8ea",
+      "name": "Translate a language",
+      "credentials": {
+        "deepLApi": {
+          "id": "Oob1HP0eMeRdTIBX",
+          "name": "DeepL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ $('Translate a language').item.json.text }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        -80
+      ],
+      "id": "ac4dabe5-cc48-4646-b56f-8d45e9ea4c5e",
+      "name": "Update a document",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "0t1ErSuUw8Ln8Ov9",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## AI Agents To Automate Document Translation",
+        "height": 80,
+        "width": 576,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -208,
+        -592
+      ],
+      "typeVersion": 1,
+      "id": "21a4b250-ce2f-4b2d-9a78-8ec3b690ed2a",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Translate a language",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Create a document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Translate a language": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a document": {
+      "main": [
+        [
+          {
+            "node": "Update a document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a28b52c1-3962-4fe8-b317-f9055211cccc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d705a9ce0fa14ee5ebe4653e2e7ed6df64537ba0abeb31024a2a1aede17ce683"
+  },
+  "id": "nfwNe85sHTaSob2T",
+  "tags": []
+}
