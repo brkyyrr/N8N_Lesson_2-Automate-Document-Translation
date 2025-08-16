@@ -85,9 +85,13 @@ The goal is to automatically translate your documents into multiple languages, p
 ## 📚 What You’ll Learn in This Video
 
 ✅ How to set up an AI translation agent in n8n
+
 ✅ Methods to automatically translate documents into multiple languages
+
 ✅ Techniques to preserve original document formatting
+
 ✅ How to trigger workflows and process files automatically
+
 ✅ Best practices for building AI-powered automation in n8n
 
 ---
@@ -95,8 +99,11 @@ The goal is to automatically translate your documents into multiple languages, p
 ## 🛠 Tools Used
 
 🔹 **n8n** – Open-source workflow automation tool
+
 🔹 **DeepL API** – AI-powered translation service
+
 🔹 **Google Drive or Local File Trigger** – To automatically detect new file
+
 🔹 **AI Agent Design Patterns** – For building flexible and reusable translation systems
 
 ---
